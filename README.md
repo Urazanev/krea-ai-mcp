@@ -84,6 +84,23 @@ This is useful when your client (Arc) should pull server code from the repositor
 }
 ```
 
+## Add to Codex
+
+1. Open `~/.codex/config.toml`.
+2. Add this block:
+
+```toml
+[mcp_servers.krea_images]
+command = "npx"
+args = ["-y", "github:Urazanev/krea-ai-mcp"]
+enabled = true
+startup_timeout_sec = 30
+tool_timeout_sec = 300
+env = { KREA_API_KEY = "your_krea_api_key_here", npm_config_cache = "/tmp/.npm-cache" }
+```
+
+3. Restart Codex app/session so it reloads MCP servers.
+
 ## Tool input notes
 
 `krea_generate_image` main fields:
