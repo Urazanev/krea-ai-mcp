@@ -57,7 +57,7 @@ Use absolute paths for your machine:
   "mcpServers": {
     "krea-images": {
       "command": "node",
-      "args": ["/Users/master/projects/kreaMcp/dist/index.js"],
+      "args": ["/path/to/krea-ai-mcp/dist/index.js"],
       "env": {
         "KREA_API_KEY": "your_krea_api_key_here"
       }
