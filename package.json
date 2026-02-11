@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Local MCP server for Krea image generation",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "bin": {
     "krea-ai-mcp": "dist/index.js"
   },
