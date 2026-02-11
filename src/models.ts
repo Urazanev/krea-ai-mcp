@@ -18,10 +18,10 @@ export const KREA_IMAGE_MODELS = {
     notes: "General-purpose text-to-image model."
   },
   flux_kontext_max: {
-    title: "BFL Flux Kontext Max",
-    endpoint: "/generate/image/bfl/flux-kontext-max",
+    title: "BFL Flux 1 Kontext Dev",
+    endpoint: "/generate/image/bfl/flux-1-kontext-dev",
     requiredFields: ["prompt"],
-    notes: "Supports text prompt and optional size."
+    notes: "Uses the current Kontext endpoint from Krea OpenAPI."
   },
   nano_banana_pro: {
     title: "Google Nano Banana Pro",
@@ -46,13 +46,13 @@ export const KREA_IMAGE_MODELS = {
     requiredFields: ["prompt"]
   },
   ideogram_2a: {
-    title: "Ideogram 2a",
-    endpoint: "/generate/image/ideogram/2a",
+    title: "Ideogram 2 Turbo",
+    endpoint: "/generate/image/ideogram/ideogram-2-turbo",
     requiredFields: ["prompt"]
   },
   ideogram_3: {
     title: "Ideogram 3",
-    endpoint: "/generate/image/ideogram/3.0",
+    endpoint: "/generate/image/ideogram/ideogram-3",
     requiredFields: ["prompt"],
     notes: "Supports optional style and referenceImage."
   },
@@ -78,13 +78,13 @@ export const KREA_IMAGE_MODELS = {
   },
   runway_gen_4_image: {
     title: "Runway Gen-4 Image",
-    endpoint: "/generate/image/runway/gen-4-image",
+    endpoint: "/generate/image/runway/gen-4",
     requiredFields: ["prompt", "referenceImages"],
     notes: "Requires one or more reference image URLs."
   },
   chatgpt_image_1: {
-    title: "OpenAI ChatGPT Image 1",
-    endpoint: "/generate/image/openai/chatgpt-image-1",
+    title: "OpenAI GPT Image",
+    endpoint: "/generate/image/openai/gpt-image",
     requiredFields: ["prompt"]
   },
   seedream_3: {
@@ -102,19 +102,18 @@ export const KREA_IMAGE_MODELS = {
   },
   seededit_3: {
     title: "Bytedance Seededit 3",
-    endpoint: "/generate/image/bytedance/seededit-3",
+    endpoint: "/generate/image/bytedance/seededit",
     requiredFields: ["prompt", "imageUrl"],
-    fixedPayload: { model: "seededit-3" },
     notes: "Image-to-image endpoint that requires image_url."
   },
   qwen_image: {
     title: "Qwen Image",
-    endpoint: "/generate/image/qwen/image",
+    endpoint: "/generate/image/qwen/2512",
     requiredFields: ["prompt"]
   },
   zimage: {
     title: "ZAI ZImage",
-    endpoint: "/generate/image/zai/zimage",
+    endpoint: "/generate/image/z-image/z-image",
     requiredFields: ["prompt", "width", "height"],
     defaultWidth: 1024,
     defaultHeight: 1024

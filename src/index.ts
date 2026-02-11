@@ -28,6 +28,7 @@ type GenerateInput = {
   width?: number;
   height?: number;
   seed?: number;
+  batch_size?: number;
   guidance_scale?: number;
   num_inference_steps?: number;
   negative_prompt?: string;
@@ -89,6 +90,7 @@ server.registerTool(
       width: z.number().int().min(256).max(4096).optional(),
       height: z.number().int().min(256).max(4096).optional(),
       seed: z.number().int().min(0).optional(),
+      batch_size: z.number().int().min(1).max(8).optional(),
       guidance_scale: z.number().positive().optional(),
       num_inference_steps: z.number().int().positive().optional(),
       negative_prompt: z.string().optional(),
@@ -119,11 +121,11 @@ server.registerTool(
 
     const createResponse = await client.generateImage(model.endpoint, payload);
     const createJob = pickJob(createResponse);
-    const jobId = readString(createJob, "id");
+    const jobId = readString(createJob, "id") ?? readString(createJob, "job_id");
 
     if (!jobId) {
       const details = stringifyUnknown(createResponse);
-      throw new Error(`Krea response does not include job.id. Response: ${details}`);
+      throw new Error(`Krea response does not include job id. Response: ${details}`);
     }
 
     if (!input.wait_for_completion) {
@@ -158,7 +160,7 @@ server.registerTool(
       timeoutMs
     });
 
-    const imageUrls = extractHttpUrls(readUnknown(finalJobResult.job, "data", "output"));
+    const imageUrls = extractHttpUrls(readUnknown(finalJobResult.job, "result"));
     const status = normalizeStatus(readString(finalJobResult.job, "status"));
     const error = readUnknown(finalJobResult.job, "error");
 
@@ -258,14 +260,20 @@ function buildPayload(input: GenerateInput, model: ModelDefinition): Record<stri
     prompt: input.prompt
   };
 
+  const size = parseSize(input.size);
+
   if (input.width !== undefined) {
     payload.width = input.width;
+  } else if (size?.width !== undefined) {
+    payload.width = size.width;
   } else if (model.requiredFields.includes("width") && model.defaultWidth !== undefined) {
     payload.width = model.defaultWidth;
   }
 
   if (input.height !== undefined) {
     payload.height = input.height;
+  } else if (size?.height !== undefined) {
+    payload.height = size.height;
   } else if (model.requiredFields.includes("height") && model.defaultHeight !== undefined) {
     payload.height = model.defaultHeight;
   }
@@ -273,23 +281,31 @@ function buildPayload(input: GenerateInput, model: ModelDefinition): Record<stri
   if (input.seed !== undefined) {
     payload.seed = input.seed;
   }
+  if (input.batch_size !== undefined) {
+    payload.batchSize = input.batch_size;
+  }
   if (input.guidance_scale !== undefined) {
-    payload.guidance_scale = input.guidance_scale;
+    if (input.model === "qwen_image") {
+      payload.cfg_scale = input.guidance_scale;
+    } else {
+      payload.guidance_scale_flux = input.guidance_scale;
+    }
   }
   if (input.num_inference_steps !== undefined) {
-    payload.num_inference_steps = input.num_inference_steps;
+    if (input.model === "qwen_image") {
+      payload.num_inference_steps = input.num_inference_steps;
+    } else {
+      payload.steps = input.num_inference_steps;
+    }
   }
-  if (input.negative_prompt !== undefined) {
+  if (input.negative_prompt !== undefined && input.model === "qwen_image") {
     payload.negative_prompt = input.negative_prompt;
   }
-  if (input.size !== undefined) {
-    payload.size = input.size;
-  }
   if (input.style !== undefined) {
-    payload.style = input.style;
+    payload.styles = [input.style];
   }
   if (input.reference_image !== undefined) {
-    payload.referenceImage = input.reference_image;
+    payload.styleImages = [input.reference_image];
   }
   if (input.reference_images !== undefined) {
     payload.referenceImages = input.reference_images;
@@ -297,11 +313,22 @@ function buildPayload(input: GenerateInput, model: ModelDefinition): Record<stri
   if (input.image_url !== undefined) {
     payload.imageUrl = input.image_url;
   }
-  if (input.sync_mode !== undefined) {
-    payload.sync_mode = input.sync_mode;
-  }
 
   return payload;
+}
+
+function parseSize(size: string | undefined): { width: number; height: number } | undefined {
+  if (!size) {
+    return undefined;
+  }
+  const match = /^([1-9][0-9]*)x([1-9][0-9]*)$/.exec(size);
+  if (!match) {
+    return undefined;
+  }
+  return {
+    width: Number(match[1]),
+    height: Number(match[2])
+  };
 }
 
 function pickJob(rawResponse: unknown): Record<string, unknown> {

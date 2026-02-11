@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = "https://api.krea.ai/v1";
+const DEFAULT_BASE_URL = "https://api.krea.ai";
 
 export class KreaApiError extends Error {
   readonly status: number;
