@@ -6,6 +6,7 @@ Local MCP server for generating images through the Krea API.
 
 - `krea_list_models`: lists supported models and required fields.
 - `krea_generate_image`: creates an image generation job for a selected model and optionally waits for completion.
+- `krea_upscale_image`: upscales/enhances an existing image URL using Krea Topaz enhance endpoints.
 
 Supported model keys:
 
@@ -124,6 +125,27 @@ Model-specific required fields:
 - `seededit_3`: requires `image_url`
 - `flux_1_1_pro`, `seedream_4`, `zimage`: require dimensions (`width`, `height`)  
   If missing, the server defaults them to `1024x1024`.
+
+`krea_upscale_image` main fields:
+
+- `mode` (optional, default `standard`): `standard` | `generative` | `bloom`
+- `image_url` (required): source image URL
+- `width`, `height` (required): output size
+- `model` (optional):
+  - `standard`: `Standard V2` | `Low Resolution V2` | `CGI` | `High Fidelity V2` | `Text Refine`
+  - `generative`: `Redefine` | `Recovery` | `Recovery V2` | `Reimagine`
+  - `bloom`: only `Reimagine`
+- `wait_for_completion`, `timeout_ms`, `poll_interval_ms`: same behavior as generation tool
+
+Common upscale options:
+
+- `batch_size` (1-4), `output_format` (`png|jpg|webp`), `image_scaling_factor` (1-32)
+- `crop_to_fill`, `upscaling_activated`
+- `sharpen`, `denoise` (standard/generative)
+- `subject_detection`, `face_enhancement`, `face_enhancement_creativity`, `face_enhancement_strength` (standard/generative)
+- `strength`, `fix_compression` (standard only)
+- `creativity`, `texture`, `detail` (generative; `creativity` is 1-6)
+- `face_preservation`, `color_preservation` (bloom only)
 
 ## API references
 
